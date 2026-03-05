@@ -236,7 +236,8 @@
         </div>
       </div>
       <div class="filter-actions">
-        <button class="btn-clear" onclick="clearFilters()">✕ Clear Filters</button>
+        <button class="btn-clear" onclick="clearFilters()">✕ Clear All</button>
+        <button class="btn-clear" id="btnResetDropdowns" onclick="resetDropdowns()" style="display:none;border-color:rgba(184,206,217,.4);color:var(--slate);">↺ Reset Filters</button>
         <span class="result-count" id="resultCount"></span>
       </div>
     </div>
@@ -363,7 +364,7 @@
       </div>
     </div>
     <div style="border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,.1);">
-      <img src="https://pembrokeod.maps.arcgis.com/sharing/rest/content/items/7c0d8f1531b940f7a6bd71ea327a6c9c/data"
+      <img src="https://pembrokeod.maps.arcgis.com/sharing/rest/content/items/7c0d8f1531b940f7a6bd71ea327a6c9c/data" 
            alt="Maps vs Layers diagram"
            style="width:100%;display:block;">
     </div>
@@ -417,19 +418,21 @@ async function loadData() {
     DATA = json.features.map(f => {
       const a = f.attributes;
       return {
-        item_name:   sv(a.item_name),
-        category:    sv(a.category),
-        snippet:     sv(a.snippet),
-        remit:       sv(a.remit),
-        owner:       sv(a.owner),
-        description: sv(a.description),
-        tags:        sv(a.tags),
-        url_to_data: sv(a.url_to_data),
-        back_up:        sv(a.back_up),
-        authoritative:  sv(a.authoritative),
-        dxf_path:       sv(a.dxf_path),
-        shape_path:     sv(a.shape_path),
-        flags:          sv(a.flags),
+        item_name:        sv(a.item_name),
+        category:         sv(a.category),
+        snippet:          sv(a.snippet),
+        remit:            sv(a.remit),
+        owner:            sv(a.owner),
+        description:      sv(a.description),
+        tags:             sv(a.tags),
+        url_to_data:      sv(a.url_to_data),
+        back_up:          sv(a.back_up),
+        update_frequency: sv(a.update_frequency),
+        update_date:      sv(a.update_date),
+        authoritative:    sv(a.authoritative),
+        dxf_path:         sv(a.dxf_path),
+        shape_path:       sv(a.shape_path),
+        flags:            sv(a.flags),
       };
     });
 
@@ -518,56 +521,84 @@ function sortBy(field) {
 }
 
 function applyFilters() {
-  const text=document.getElementById('searchText').value.trim().toLowerCase();
-  const cat=document.getElementById('filterCategory').value;
-  const remit=document.getElementById('filterRemit').value;
-  const owner=document.getElementById('filterOwner').value;
-  const flagF=document.getElementById('filterFlag').value;
+  const text  = document.getElementById('searchText').value.trim().toLowerCase();
+  const cat   = document.getElementById('filterCategory').value;
+  const remit = document.getElementById('filterRemit').value;
+  const owner = document.getElementById('filterOwner').value;
+  const flagF = document.getElementById('filterFlag').value;
 
-  const catSubset = cat ? DATA.filter(d => d.category === cat) : DATA;
-  updateDependentDropdowns(catSubset, remit, owner, flagF);
-
-  let filtered=DATA.filter(d=>{
-    if(cat   && d.category!==cat)  return false;
-    if(remit && d.remit!==remit)   return false;
-    if(owner && d.owner!==owner)   return false;
-    if(flagF && !(d.flags && d.flags.split(',').map(f=>f.trim()).includes(flagF))) return false;
-    if(text){const hay=[d.item_name,d.snippet,d.description,d.tags,d.flags,d.remit,d.owner].join(' ').toLowerCase();if(!hay.includes(text))return false;}
+  // Helper: filter DATA by everything EXCEPT one field, for cascading options
+  const subsetExcluding = (excludeField) => DATA.filter(d => {
+    if (excludeField !== 'category' && cat   && d.category !== cat)  return false;
+    if (excludeField !== 'remit'    && remit && d.remit    !== remit) return false;
+    if (excludeField !== 'owner'    && owner && d.owner    !== owner) return false;
+    if (excludeField !== 'flag'     && flagF && !(d.flags && d.flags.split(',').map(f=>f.trim()).includes(flagF))) return false;
+    if (text) { const hay=[d.item_name,d.snippet,d.description,d.tags,d.flags,d.remit,d.owner].join(' ').toLowerCase(); if(!hay.includes(text)) return false; }
     return true;
   });
 
-  if(sortField) filtered.sort((a,b)=>{
-    const av=(a[sortField]||'').toLowerCase(),bv=(b[sortField]||'').toLowerCase();
-    return sortAsc?av.localeCompare(bv):bv.localeCompare(av);
+  // Cascade: each dropdown shows options valid given all OTHER active filters
+  updateDropdown('filterCategory', 'category',  subsetExcluding('category'), cat,   'All Categories');
+  updateDropdown('filterRemit',    'remit',      subsetExcluding('remit'),    remit, 'All Remits');
+  updateDropdown('filterOwner',    'owner',      subsetExcluding('owner'),    owner, 'All Owners');
+  updateFlagDropdown(subsetExcluding('flag'), flagF);
+
+  // Show/hide reset button depending on whether any dropdown filter is active
+  const anyActive = cat || remit || owner || flagF;
+  document.getElementById('btnResetDropdowns').style.display = anyActive ? 'inline-flex' : 'none';
+
+  // Full filtered set
+  let filtered = DATA.filter(d => {
+    if (cat   && d.category !== cat)  return false;
+    if (remit && d.remit    !== remit) return false;
+    if (owner && d.owner    !== owner) return false;
+    if (flagF && !(d.flags && d.flags.split(',').map(f=>f.trim()).includes(flagF))) return false;
+    if (text) { const hay=[d.item_name,d.snippet,d.description,d.tags,d.flags,d.remit,d.owner].join(' ').toLowerCase(); if(!hay.includes(text)) return false; }
+    return true;
   });
 
-  currentFiltered=filtered;
+  if (sortField) filtered.sort((a,b) => {
+    const av=(a[sortField]||'').toLowerCase(), bv=(b[sortField]||'').toLowerCase();
+    return sortAsc ? av.localeCompare(bv) : bv.localeCompare(av);
+  });
+
+  currentFiltered = filtered;
   renderTable(filtered); renderChart(filtered); renderStats(filtered);
-  document.getElementById('resultCount').innerHTML=`<strong>${filtered.length}</strong> of ${DATA.length} items`;
+  document.getElementById('resultCount').innerHTML = `<strong>${filtered.length}</strong> of ${DATA.length} items`;
 }
 
-function updateDependentDropdowns(subset, curRemit, curOwner, curFlag) {
-  const remitSel = document.getElementById('filterRemit');
-  const remits = [...new Set(subset.map(d=>d.remit).filter(Boolean))].sort();
-  remitSel.innerHTML = '<option value="">All Remits</option>';
-  remits.forEach(v => remitSel.add(new Option(v,v)));
-  if (remits.includes(curRemit)) remitSel.value = curRemit;
+function updateDropdown(id, field, subset, curVal, allLabel) {
+  const sel = document.getElementById(id);
+  const vals = [...new Set(subset.map(d => d[field]).filter(Boolean))].sort();
+  sel.innerHTML = `<option value="">${allLabel}</option>`;
+  vals.forEach(v => {
+    const opt = new Option(v, v);
+    if (v === curVal) opt.selected = true;
+    sel.add(opt);
+  });
+  // If current value no longer in list, reset it
+  if (curVal && !vals.includes(curVal)) sel.value = '';
+}
 
-  const ownerSel = document.getElementById('filterOwner');
-  const owners = [...new Set(subset.map(d=>d.owner).filter(Boolean))].sort();
-  ownerSel.innerHTML = '<option value="">All Owners</option>';
-  owners.forEach(v => ownerSel.add(new Option(v,v)));
-  if (owners.includes(curOwner)) ownerSel.value = curOwner;
-
+function updateFlagDropdown(subset, curFlag) {
   const flagSel = document.getElementById('filterFlag');
   const flags = [...new Set(subset.flatMap(d => d.flags ? d.flags.split(',').map(f=>f.trim()).filter(Boolean) : []))].sort();
   flagSel.innerHTML = '<option value="">All Items</option>';
-  flags.forEach(f => flagSel.add(new Option(f,f)));
-  if (flags.includes(curFlag)) flagSel.value = curFlag;
+  flags.forEach(f => {
+    const opt = new Option(f, f);
+    if (f === curFlag) opt.selected = true;
+    flagSel.add(opt);
+  });
+  if (curFlag && !flags.includes(curFlag)) flagSel.value = '';
 }
 
 function clearFilters() {
   document.getElementById('searchText').value='';
+  ['filterCategory','filterRemit','filterOwner','filterFlag'].forEach(id=>document.getElementById(id).value='');
+  applyFilters();
+}
+
+function resetDropdowns() {
   ['filterCategory','filterRemit','filterOwner','filterFlag'].forEach(id=>document.getElementById(id).value='');
   applyFilters();
 }
@@ -607,6 +638,32 @@ function toggleSum(i) {
   if(tog)tog.textContent=exp?'Show less':'Show more';
 }
 
+// Returns the formatted update frequency string, appending (Due: date) when appropriate
+function formatUpdateFrequency(freq, date) {
+  if (!freq) return '—';
+  const lower = freq.toLowerCase().trim();
+  // Show date alongside the frequency unless it's static, unknown, or blank
+  const hideDate = lower === 'static' || lower === 'unknown' || lower === '';
+  if (!hideDate && date) {
+    return `${h(freq)} <span style="color:var(--slate);font-size:.82em">(Due: ${h(date)})</span>`;
+  }
+  return h(freq);
+}
+
+// Formats description: linkifies any http/https URLs embedded in the text
+function formatDescription(text) {
+  if (!text) return '';
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  // split with a capture group puts matched URLs at odd indices
+  return text.split(urlRegex).map((part, i) => {
+    if (i % 2 === 1) {
+      // odd index = matched URL
+      return `<a href="${h(part)}" target="_blank" class="info-link" style="word-break:break-all;overflow-wrap:anywhere;">${h(part)}</a>`;
+    }
+    return h(part);
+  }).join('');
+}
+
 function openModal(i) {
   const d=currentFiltered[i],st=catStyle(d.category);
   const linkBtns=[];
@@ -622,16 +679,18 @@ function openModal(i) {
   </a>`);
 
   const flagHtml=d.flags?d.flags.split(',').map(f=>`<span class="flag-tag">${h(f.trim())}</span>`).join(' '):'<em style="color:var(--grey)">None</em>';
+
   document.getElementById('modalContent').innerHTML=`
     ${d.category?`<div class="modal-cat" style="background:${st.bg};color:${st.color};border:1px solid ${st.color}44">${h(d.category)}</div>`:''}
     <h2>${h(d.item_name)}${d.authoritative.toLowerCase()==='yes'?'<span class="auth-tick auth-tick-lg" title="Authoritative Dataset">✓</span>':''}</h2>
     ${d.snippet?`<div class="modal-section"><div class="modal-section-label">Summary</div><p>${h(d.snippet)}</p></div>`:''}
-    <div class="modal-section"><div class="modal-section-label">Description</div><p ${d.description?'':'class="empty"'}>${d.description?h(d.description):'No description provided.'}</p></div>
+    <div class="modal-section"><div class="modal-section-label">Description</div><p style="word-break:break-word;overflow-wrap:anywhere;" ${d.description?'':'class="empty"'}>${d.description?formatDescription(d.description):'No description provided.'}</p></div>
     <div class="modal-meta">
       <div><div class="meta-label">Remit</div><div class="meta-value">${h(d.remit)||'—'}</div></div>
       <div><div class="meta-label">Owner</div><div class="meta-value">${h(d.owner)||'—'}</div></div>
-      <div><div class="meta-label">Tags</div><div class="meta-value">${h(d.tags)||'—'}</div></div>
       <div><div class="meta-label">Back Up Status</div><div class="meta-value">${h(d.back_up)||'—'}</div></div>
+      <div><div class="meta-label">Update Frequency</div><div class="meta-value">${formatUpdateFrequency(d.update_frequency, d.update_date)}</div></div>
+      <div style="grid-column:1/-1"><div class="meta-label">Tags</div><div class="meta-value">${h(d.tags)||'—'}</div></div>
       <div style="grid-column:1/-1"><div class="meta-label">Flags</div><div class="meta-value">${flagHtml}</div></div>
     </div>
     ${linkBtns.length?`<div class="modal-links">${linkBtns.join('')}</div>`:''}`;
