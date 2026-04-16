@@ -164,6 +164,71 @@
   .auth-tick-lg { width:22px; height:22px; font-size:.8rem; }
 
   ::-webkit-scrollbar{width:6px;height:6px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:3px}
+
+  /* VIEW TOGGLE */
+  .view-toggle { display:flex; gap:8px; margin-bottom:16px; }
+  .btn-view { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:6px; color:var(--grey); cursor:pointer; font-family:'Calibri',sans-serif; font-size:.82rem; font-weight:700; padding:9px 20px; transition:all .2s; letter-spacing:.05em; text-transform:uppercase; display:inline-flex; align-items:center; gap:7px; }
+  .btn-view:hover { border-color:var(--slate); color:#fff; }
+  .btn-view.active { background:rgba(215,40,47,.15); border-color:var(--red); color:#fff; }
+  .btn-view svg { flex-shrink:0; }
+
+  /* GANTT WRAPPER */
+  .gantt-wrap { background:rgba(31,31,85,.4); border:1px solid rgba(255,255,255,.08); border-radius:10px; overflow:hidden; }
+
+  /* GANTT CONTROLS */
+  .gantt-controls { display:flex; align-items:center; justify-content:space-between; padding:13px 20px; border-bottom:2px solid rgba(215,40,47,.2); gap:12px; }
+  .gantt-range-label { font-family:'Oswald',sans-serif; font-size:.9rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:#fff; text-align:center; flex:1; }
+  .btn-gnav { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:5px; color:var(--slate); cursor:pointer; font-family:'Calibri',sans-serif; font-size:.78rem; font-weight:700; padding:7px 14px; transition:all .2s; white-space:nowrap; }
+  .btn-gnav:hover { background:rgba(215,40,47,.15); border-color:var(--red); color:#fff; }
+  .btn-gnav:disabled { opacity:.35; cursor:not-allowed; }
+
+  /* GANTT BODY */
+  .gantt-body { overflow-x:auto; }
+  .gantt-inner { min-width:620px; }
+
+  /* GANTT HEADER ROW (months) */
+  .gantt-header-row { display:flex; border-bottom:1px solid rgba(255,255,255,.1); background:rgba(215,40,47,.07); }
+  .gantt-name-hdr { flex:0 0 200px; padding:9px 16px; font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--grey); border-right:1px solid rgba(255,255,255,.08); }
+  .gantt-months-hdr { flex:1; display:flex; position:relative; }
+  .gantt-month-cell { flex:1; text-align:center; font-family:'Oswald',sans-serif; font-size:.78rem; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--slate); padding:9px 0 6px; border-left:1px solid rgba(255,255,255,.08); position:relative; }
+  .gantt-month-cell:first-child { border-left:none; }
+  /* Week tick labels inside month header */
+  .gantt-week-ticks { position:relative; display:flex; height:16px; margin-top:2px; }
+  .gantt-week-tick { position:absolute; transform:translateX(-50%); font-size:.58rem; color:rgba(255,255,255,.2); line-height:1; }
+
+  /* GANTT ROW */
+  .gantt-row { display:flex; border-bottom:1px solid rgba(255,255,255,.04); transition:background .12s; }
+  .gantt-row:hover { background:rgba(109,58,133,.1); }
+  .gantt-row:last-child { border-bottom:none; }
+  .gantt-name { flex:0 0 200px; padding:0 16px; font-size:.77rem; color:var(--silver); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:flex; align-items:center; height:38px; border-right:1px solid rgba(255,255,255,.06); }
+  .gantt-timeline { flex:1; position:relative; height:38px; }
+
+  /* Month boundary lines in timeline */
+  .gantt-mboundary { position:absolute; top:0; bottom:0; width:1px; background:rgba(255,255,255,.08); pointer-events:none; }
+
+  /* Today line */
+  .gantt-today-line { position:absolute; top:0; bottom:0; width:2px; background:var(--red); opacity:.55; pointer-events:none; z-index:1; }
+
+  /* Dots */
+  .gantt-dot { position:absolute; width:11px; height:11px; border-radius:50%; top:50%; transform:translate(-50%,-50%); cursor:pointer; border:2px solid rgba(255,255,255,.25); transition:transform .15s, box-shadow .15s; z-index:2; }
+  .gantt-dot:hover { transform:translate(-50%,-50%) scale(1.65); box-shadow:0 0 10px rgba(255,255,255,.35); z-index:10; }
+  /* Tooltip via CSS */
+  .gantt-dot::after { content:attr(data-tip); position:absolute; bottom:calc(100% + 8px); left:50%; transform:translateX(-50%); background:rgba(14,14,40,.97); border:1px solid rgba(255,255,255,.18); border-radius:5px; color:#fff; font-family:'Calibri',sans-serif; font-size:.74rem; padding:5px 10px; white-space:nowrap; pointer-events:none; opacity:0; transition:opacity .12s; z-index:100; }
+  .gantt-dot:hover::after { opacity:1; }
+
+  /* No items message */
+  .gantt-empty { padding:50px 20px; text-align:center; color:var(--grey); }
+  .gantt-empty strong { display:block; font-size:1.1rem; color:var(--silver); margin-bottom:6px; }
+
+  /* Gantt legend */
+  .gantt-legend { display:flex; flex-wrap:wrap; gap:10px 18px; padding:12px 16px 14px; border-top:1px solid rgba(255,255,255,.06); background:rgba(0,0,0,.1); }
+  .gantt-legend-item { display:flex; align-items:center; gap:6px; font-size:.7rem; color:var(--silver); }
+  .gantt-legend-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; border:2px solid rgba(255,255,255,.2); }
+  .gantt-legend-label { font-size:.68rem; text-transform:uppercase; letter-spacing:.06em; color:var(--grey); padding-right:12px; font-weight:700; font-family:'Oswald',sans-serif; }
+
+  /* Gantt info bar */
+  .gantt-info-bar { display:flex; align-items:center; gap:14px; padding:8px 16px; background:rgba(109,58,133,.1); border-bottom:1px solid rgba(255,255,255,.06); font-size:.74rem; color:var(--slate); flex-wrap:wrap; }
+  .gantt-info-bar strong { color:#fff; }
 </style>
 </head>
 <body>
@@ -242,7 +307,19 @@
       </div>
     </div>
 
-    <div class="table-wrap">
+    <!-- View Toggle -->
+    <div class="view-toggle">
+      <button class="btn-view active" id="btnViewList" onclick="switchView('list')">
+        <svg viewBox="0 0 16 16" fill="currentColor" width="13" height="13"><path d="M1 3h14v2H1zm0 4h14v2H1zm0 4h14v2H1z"/></svg>
+        List View
+      </button>
+      <button class="btn-view" id="btnViewGantt" onclick="switchView('gantt')">
+        <svg viewBox="0 0 16 16" fill="currentColor" width="13" height="13"><path d="M1 2h2v12H1zm3 3h5v2H4zm0 4h8v2H4zM10 5h4v2h-4z"/></svg>
+        Update Schedule
+      </button>
+    </div>
+
+    <div class="table-wrap" id="tableWrap">
       <table>
         <thead>
           <tr>
@@ -261,6 +338,20 @@
         <strong>No results found</strong>
         Try adjusting your search or clearing filters
       </div>
+    </div>
+
+    <!-- Gantt / Update Schedule View -->
+    <div class="gantt-wrap" id="ganttWrap" style="display:none">
+      <div class="gantt-controls">
+        <button class="btn-gnav" id="btnGanttPrev" onclick="ganttShift(-3)">&#8592; Prev</button>
+        <span class="gantt-range-label" id="ganttRangeLabel">&#8212;</span>
+        <button class="btn-gnav" id="btnGanttNext" onclick="ganttShift(3)">Next &#8594;</button>
+      </div>
+      <div class="gantt-info-bar" id="ganttInfoBar"></div>
+      <div class="gantt-body">
+        <div class="gantt-inner" id="ganttInner"></div>
+      </div>
+      <div class="gantt-legend" id="ganttLegend"></div>
     </div>
   </div>
 
@@ -428,7 +519,7 @@ async function loadData() {
         url_to_data:      sv(a.url_to_data),
         back_up:          sv(a.back_up),
         update_frequency: sv(a.update_frequency),
-        update_date:      sv(a.update_date),
+        update_due:      sv(a.update_due),
         authoritative:    sv(a.authoritative),
         dxf_path:         sv(a.dxf_path),
         shape_path:       sv(a.shape_path),
@@ -564,6 +655,7 @@ function applyFilters() {
 
   currentFiltered = filtered;
   renderTable(filtered); renderChart(filtered); renderStats(filtered);
+  if (currentView === 'gantt') renderGantt();
   document.getElementById('resultCount').innerHTML = `<strong>${filtered.length}</strong> of ${DATA.length} items`;
 }
 
@@ -689,7 +781,7 @@ function openModal(i) {
       <div><div class="meta-label">Remit</div><div class="meta-value">${h(d.remit)||'—'}</div></div>
       <div><div class="meta-label">Owner</div><div class="meta-value">${h(d.owner)||'—'}</div></div>
       <div><div class="meta-label">Back Up Status</div><div class="meta-value">${h(d.back_up)||'—'}</div></div>
-      <div><div class="meta-label">Update Frequency</div><div class="meta-value">${formatUpdateFrequency(d.update_frequency, d.update_date)}</div></div>
+      <div><div class="meta-label">Update Frequency</div><div class="meta-value">${formatUpdateFrequency(d.update_frequency, d.update_due)}</div></div>
       <div style="grid-column:1/-1"><div class="meta-label">Tags</div><div class="meta-value">${h(d.tags)||'—'}</div></div>
       <div style="grid-column:1/-1"><div class="meta-label">Flags</div><div class="meta-value">${flagHtml}</div></div>
     </div>
@@ -726,6 +818,259 @@ function closeInfoModal() {
   document.body.style.overflow='';
 }
 function bgCloseInfo(e) { if(e.target===document.getElementById('infoModalOverlay')) closeInfoModal(); }
+
+// ─── GANTT / UPDATE SCHEDULE VIEW ─────────────────────────────────────────
+
+let currentView = 'list';
+let ganttStartMonth = null; // Date object, 1st of start month
+
+function switchView(v) {
+  currentView = v;
+  document.getElementById('tableWrap').style.display  = v === 'list'  ? '' : 'none';
+  document.getElementById('ganttWrap').style.display  = v === 'gantt' ? '' : 'none';
+  document.getElementById('btnViewList').classList.toggle('active',  v === 'list');
+  document.getElementById('btnViewGantt').classList.toggle('active', v === 'gantt');
+  if (v === 'gantt') {
+    if (!ganttStartMonth) {
+      ganttStartMonth = new Date();
+      ganttStartMonth.setDate(1);
+      ganttStartMonth.setHours(0,0,0,0);
+    }
+    renderGantt();
+  }
+}
+
+// Parse a date value from the feature layer (ISO string or epoch ms)
+function parseGanttDate(val) {
+  if (!val) return null;
+  const s = String(val).trim();
+  if (!s || s === 'null' || s === 'undefined') return null;
+  const lo = s.toLowerCase();
+  if (lo.includes('n/a') || lo.includes('unknown') || lo.includes('static') ||
+      lo.includes('not applicable') || lo.includes('as required')) return null;
+  // Epoch ms as numeric string
+  if (/^\d{10,13}$/.test(s)) {
+    const ts = parseInt(s);
+    const d = new Date(ts > 9999999999 ? ts : ts * 1000);
+    return isNaN(d.getTime()) ? null : d;
+  }
+  const d = new Date(s);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+// Return repeat interval in months, or null for single-occurrence
+function freqIntervalMonths(freq) {
+  if (!freq) return null;
+  const lo = freq.toLowerCase().trim();
+  if (lo.includes('week') || lo.includes('daily') || lo.includes('fortnight')) return null;
+  if ((lo.includes('bi') && lo.includes('month')) || lo.includes('bimonth')) return 2;
+  if (lo.includes('month') && !lo.includes('6') && !lo.includes('six') && !lo.includes('half')) return 1;
+  if (lo.includes('quarter') || lo === '3 monthly' || lo.includes('3-month')) return 3;
+  if (lo.includes('six') || lo.includes('half') || lo.includes('6 month') || lo.includes('6-month')) return 6;
+  if (lo.includes('bi-annual') || lo.includes('biannual') || lo.includes('twice a year')) return 6;
+  if (lo.includes('annual') || lo.includes('yearly') || lo.includes('year') || lo.includes('12 month')) return 12;
+  return null; // single occurrence
+}
+
+// Get all occurrences of an item's due date within [rangeStart, rangeEnd]
+function getOccurrences(baseDate, frequency, rangeStart, rangeEnd) {
+  const intervalMonths = freqIntervalMonths(frequency);
+
+  const dates = [];
+  let cur = new Date(baseDate);
+
+  // ❌ Do NOT go backwards
+
+  // If base is before range, fast-forward to first valid occurrence
+  if (intervalMonths && cur < rangeStart) {
+    let safety = 0;
+    while (cur < rangeStart && safety++ < 300) {
+      const next = new Date(cur);
+      next.setMonth(next.getMonth() + intervalMonths);
+      if (next <= cur) break;
+      cur = next;
+    }
+  }
+
+  // Collect forward
+  let safety = 0;
+  while (cur <= rangeEnd && safety++ < 300) {
+    if (cur >= rangeStart) dates.push(new Date(cur));
+
+    if (!intervalMonths) break;
+
+    const next = new Date(cur);
+    next.setMonth(next.getMonth() + intervalMonths);
+    if (next <= cur) break;
+    cur = next;
+  }
+
+  return dates;
+}
+
+function ganttShift(deltaMonths) {
+  const today = new Date();
+  today.setDate(1); today.setHours(0,0,0,0);
+  const maxStart = new Date(today);
+  maxStart.setMonth(maxStart.getMonth() + 21); // allows 3-month window ending at +24 months
+
+  const proposed = new Date(ganttStartMonth);
+  proposed.setMonth(proposed.getMonth() + deltaMonths);
+
+  if (proposed < today) proposed.setFullYear(today.getFullYear(), today.getMonth(), 1);
+  if (proposed > maxStart) proposed.setFullYear(maxStart.getFullYear(), maxStart.getMonth(), 1);
+
+  ganttStartMonth = proposed;
+  renderGantt();
+}
+
+function renderGantt() {
+  if (!ganttStartMonth) return;
+
+  // ── Date range ──────────────────────────────────────────────────────────
+  const rangeStart = new Date(ganttStartMonth);
+  rangeStart.setHours(0,0,0,0);
+  const rangeEnd = new Date(rangeStart);
+  rangeEnd.setMonth(rangeEnd.getMonth() + 3);
+  rangeEnd.setDate(0); // last day of 3rd month
+  rangeEnd.setHours(23,59,59,999);
+
+  const today = new Date();
+  const todayMs = today.getTime();
+
+  const totalMs = rangeEnd.getTime() - rangeStart.getTime();
+
+  // ── Nav controls ────────────────────────────────────────────────────────
+  const todayFirst = new Date(); todayFirst.setDate(1); todayFirst.setHours(0,0,0,0);
+  const maxStart = new Date(todayFirst); maxStart.setMonth(maxStart.getMonth() + 21);
+
+  document.getElementById('btnGanttPrev').disabled = rangeStart <= todayFirst;
+  document.getElementById('btnGanttNext').disabled = rangeStart >= maxStart;
+
+  const fmtMonth = d => d.toLocaleString('default', {month:'short', year:'numeric'});
+  document.getElementById('ganttRangeLabel').textContent =
+    `${fmtMonth(rangeStart)} — ${fmtMonth(rangeEnd)}`;
+
+  // ── Build month segments ─────────────────────────────────────────────────
+  const months = [];
+  for (let m = 0; m < 3; m++) {
+    const mStart = new Date(rangeStart);
+    mStart.setMonth(mStart.getMonth() + m);
+    const mEnd = new Date(mStart);
+    mEnd.setMonth(mEnd.getMonth() + 1);
+    mEnd.setDate(0); mEnd.setHours(23,59,59,999);
+    const daysInMonth = mEnd.getDate();
+    const widthPct = (mEnd.getTime() - mStart.getTime() + 1) / totalMs * 100;
+    const offsetPct = (mStart.getTime() - rangeStart.getTime()) / totalMs * 100;
+    months.push({ label: mStart.toLocaleString('default', {month:'long', year:'numeric'}), mStart, mEnd, daysInMonth, widthPct, offsetPct });
+  }
+
+  // ── Filter items with valid dates ────────────────────────────────────────
+  const ganttItems = currentFiltered.map(d => {
+    const base = parseGanttDate(d.update_due);
+    if (!base) return null;
+    const dots = getOccurrences(base, d.update_frequency, rangeStart, rangeEnd);
+    if (!dots.length) return null;
+    return { ...d, dots };
+  }).filter(Boolean);
+
+  // Sort by earliest dot in range
+  ganttItems.sort((a, b) => a.dots[0] - b.dots[0]);
+
+  // ── Info bar ─────────────────────────────────────────────────────────────
+  const totalWithDates = currentFiltered.filter(d => parseGanttDate(d.update_due)).length;
+  const excluded = currentFiltered.length - totalWithDates;
+  document.getElementById('ganttInfoBar').innerHTML =
+    `<strong>${ganttItems.length}</strong> dataset${ganttItems.length!==1?'s':''} with updates due in this period &nbsp;·&nbsp; ` +
+    `<strong>${excluded}</strong> item${excluded!==1?'s':''} excluded (static / no date set) &nbsp;·&nbsp; ` +
+    `Hover a dot for name &nbsp;·&nbsp; Click for details`;
+
+  // ── Today line pct ────────────────────────────────────────────────────────
+  const todayInRange = todayMs >= rangeStart.getTime() && todayMs <= rangeEnd.getTime();
+  const todayPct = todayInRange ? (todayMs - rangeStart.getTime()) / totalMs * 100 : null;
+
+  // ── Build header HTML ─────────────────────────────────────────────────────
+  let monthHeaderCells = months.map(m => {
+    // Week tick labels (day 8, 15, 22) as subtle sub-labels
+    let weekTicksHtml = '';
+    const weekDays = [8, 15, 22];
+    weekDays.forEach(day => {
+      if (day < m.daysInMonth) {
+        // Position of this day within the month, then within the cell
+        const dayPct = (day - 1) / m.daysInMonth * 100;
+        weekTicksHtml += `<span class="gantt-week-tick" style="left:${dayPct}%">${day}</span>`;
+      }
+    });
+    return `<div class="gantt-month-cell" style="flex:${m.widthPct} 0 0%">
+      ${m.label}
+      <div class="gantt-week-ticks">${weekTicksHtml}</div>
+    </div>`;
+  }).join('');
+
+  const headerHtml = `<div class="gantt-header-row">
+    <div class="gantt-name-hdr">Dataset</div>
+    <div class="gantt-months-hdr" style="position:relative">${monthHeaderCells}</div>
+  </div>`;
+
+  // ── Build row HTML ────────────────────────────────────────────────────────
+  let rowsHtml = '';
+  if (!ganttItems.length) {
+    rowsHtml = `<div class="gantt-empty"><strong>No updates due in this period</strong>Try navigating to a different time range, or check that your datasets have update dates set.</div>`;
+  } else {
+    rowsHtml = ganttItems.map(item => {
+      const st = catStyle(item.category);
+      // Month divider lines at each month boundary
+      let dividersHtml = '';
+      months.forEach((m, mi) => {
+        if (mi > 0) {
+          dividersHtml += `<div class="gantt-mboundary" style="left:${m.offsetPct}%"></div>`;
+        }
+      });
+      // Today line
+      const todayLineHtml = todayPct !== null
+        ? `<div class="gantt-today-line" style="left:${todayPct}%"></div>` : '';
+
+      const dotsHtml = item.dots.map(date => {
+        const pct = (date.getTime() - rangeStart.getTime()) / totalMs * 100;
+        const fmtDate = date.toLocaleDateString('en-AU', {day:'numeric', month:'short', year:'numeric'});
+        const tip = `${item.item_name} — Due: ${fmtDate}`;
+        // Find index in currentFiltered for modal
+        const idx = currentFiltered.findIndex(d => d.item_name === item.item_name);
+        return `<div class="gantt-dot"
+          style="left:${pct.toFixed(2)}%;background:${st.bar};"
+          data-tip="${h(tip)}"
+          onclick="openGanttItem(${idx})"
+        ></div>`;
+      }).join('');
+
+      return `<div class="gantt-row">
+        <div class="gantt-name" title="${h(item.item_name)}">${h(item.item_name)}</div>
+        <div class="gantt-timeline">${dividersHtml}${todayLineHtml}${dotsHtml}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // ── Legend ───────────────────────────────────────────────────────────────
+  const catsInGantt = [...new Set(ganttItems.map(d => d.category).filter(Boolean))].sort();
+  const legendHtml = catsInGantt.length
+    ? `<span class="gantt-legend-label">Categories:</span>` +
+      catsInGantt.map(cat => {
+        const st = catStyle(cat);
+        return `<span class="gantt-legend-item"><span class="gantt-legend-dot" style="background:${st.bar}"></span>${h(cat)}</span>`;
+      }).join('')
+    : '';
+  document.getElementById('ganttLegend').innerHTML = legendHtml;
+  document.getElementById('ganttLegend').style.display = catsInGantt.length ? '' : 'none';
+
+  // ── Render ────────────────────────────────────────────────────────────────
+  document.getElementById('ganttInner').innerHTML = headerHtml + rowsHtml;
+}
+
+function openGanttItem(idx) {
+  if (idx >= 0 && idx < currentFiltered.length) openModal(idx);
+}
+
+// ─── END GANTT ─────────────────────────────────────────────────────────────
 
 loadData();
 </script>
