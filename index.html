@@ -71,6 +71,10 @@
   .stat-card:nth-child(4) .stat-accent { background:#4caf77; }
   .stat-card:nth-child(5) .stat-accent { background:#f0a500; }
   .stat-card:nth-child(6) .stat-accent { background:#B8CED9; }
+  .stat-card:nth-child(7) .stat-accent { background:#D7282F; }
+  .stat-card.stat-overdue { cursor:pointer; }
+  .stat-card.stat-overdue:hover { border-color:#D7282F; }
+  .stat-card.stat-overdue .stat-num { color:#f08080; }
 
   /* MAIN */
   .main { display:grid; grid-template-columns:1fr 310px; padding:28px 40px; max-width:1600px; margin:0 auto; }
@@ -170,6 +174,8 @@
   .btn-view { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:6px; color:var(--grey); cursor:pointer; font-family:'Calibri',sans-serif; font-size:.82rem; font-weight:700; padding:9px 20px; transition:all .2s; letter-spacing:.05em; text-transform:uppercase; display:inline-flex; align-items:center; gap:7px; }
   .btn-view:hover { border-color:var(--slate); color:#fff; }
   .btn-view.active { background:rgba(215,40,47,.15); border-color:var(--red); color:#fff; }
+  #btnViewOverdue:hover { border-color:var(--red); color:#fff; }
+  #btnViewOverdue.active { background:rgba(215,40,47,.2); border-color:var(--red); color:#f08080; }
   .btn-view svg { flex-shrink:0; }
 
   /* GANTT WRAPPER */
@@ -317,6 +323,10 @@
         <svg viewBox="0 0 16 16" fill="currentColor" width="13" height="13"><path d="M1 2h2v12H1zm3 3h5v2H4zm0 4h8v2H4zM10 5h4v2h-4z"/></svg>
         Update Schedule
       </button>
+      <button class="btn-view" id="btnViewOverdue" onclick="switchView('overdue')" style="border-color:rgba(215,40,47,.4);color:#f08080;">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+        Overdue
+      </button>
     </div>
 
     <div class="table-wrap" id="tableWrap">
@@ -352,6 +362,35 @@
         <div class="gantt-inner" id="ganttInner"></div>
       </div>
       <div class="gantt-legend" id="ganttLegend"></div>
+    </div>
+
+    <!-- Overdue View -->
+    <div class="gantt-wrap" id="overdueWrap" style="display:none">
+      <div class="gantt-controls" style="border-bottom-color:rgba(215,40,47,.35);">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" style="color:#f08080;flex-shrink:0"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+          <span class="gantt-range-label" style="text-align:left;color:#f08080;">Overdue Datasets</span>
+        </div>
+        <span id="overdueCount" style="font-size:.75rem;color:var(--slate);"></span>
+      </div>
+      <div class="gantt-info-bar" id="overdueInfoBar" style="background:rgba(215,40,47,.08);border-bottom-color:rgba(215,40,47,.15);">
+        Datasets where <strong>Update Due = "Due Now"</strong> &nbsp;·&nbsp; Click a row to view full details
+      </div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;">
+          <thead>
+            <tr style="background:rgba(215,40,47,.12);border-bottom:2px solid var(--red);">
+              <th style="font-family:'Oswald',sans-serif;font-size:.78rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);padding:12px 16px;text-align:left;white-space:nowrap;">Dataset Name</th>
+              <th style="font-family:'Oswald',sans-serif;font-size:.78rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);padding:12px 16px;text-align:left;white-space:nowrap;">SLT Remit</th>
+              <th style="font-family:'Oswald',sans-serif;font-size:.78rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);padding:12px 16px;text-align:left;white-space:nowrap;">Owner</th>
+              <th style="font-family:'Oswald',sans-serif;font-size:.78rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);padding:12px 16px;text-align:left;white-space:nowrap;">Update Frequency</th>
+              <th style="font-family:'Oswald',sans-serif;font-size:.78rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--slate);padding:12px 16px;text-align:left;white-space:nowrap;">Last Edit Date</th>
+            </tr>
+          </thead>
+          <tbody id="overdueTableBody"></tbody>
+        </table>
+        <div id="overdueEmpty" style="display:none;padding:50px 20px;text-align:center;color:var(--grey);"><strong style="display:block;font-size:1.1rem;color:#7dcca0;margin-bottom:6px;">✓ No Overdue Datasets</strong>All datasets are up to date in the current filtered view.</div>
+      </div>
     </div>
   </div>
 
@@ -524,6 +563,7 @@ async function loadData() {
         dxf_path:         sv(a.dxf_path),
         shape_path:       sv(a.shape_path),
         flags:            sv(a.flags),
+        last_edit_date:   sv(a.last_edit_date),
       };
     });
 
@@ -571,6 +611,8 @@ function renderStats(subset) {
   const flagged=src.filter(d=>d.flags).length;
   const authoritative=src.filter(d=>d.authoritative && d.authoritative.toLowerCase()==='yes').length;
   const verifiedPct=src.length?Math.round(authoritative/src.length*100):0;
+  const overdue=src.filter(d=>d.update_due && d.update_due.trim().toLowerCase()==='due now').length;
+  const overdueCard=`<div class="stat-card stat-overdue" onclick="switchView('overdue')" title="Click to view overdue datasets"><div class="stat-num">${overdue}</div><div class="stat-label">Overdue</div><div class="stat-accent"></div></div>`;
   document.getElementById('statsRow').innerHTML=[
     {num:src.length,      label:'Total Datasets'},
     {num:cats.size,       label:'Categories'},
@@ -578,7 +620,7 @@ function renderStats(subset) {
     {num:backupPct+'%',   label:'Backed Up'},
     {num:flagged,         label:'Items Flagged'},
     {num:verifiedPct+'%', label:'Verified Data'},
-  ].map(s=>`<div class="stat-card"><div class="stat-num">${s.num}</div><div class="stat-label">${s.label}</div><div class="stat-accent"></div></div>`).join('');
+  ].map(s=>`<div class="stat-card"><div class="stat-num">${s.num}</div><div class="stat-label">${s.label}</div><div class="stat-accent"></div></div>`).join('') + overdueCard;
 }
 
 function renderChart(filtered) {
@@ -656,6 +698,7 @@ function applyFilters() {
   currentFiltered = filtered;
   renderTable(filtered); renderChart(filtered); renderStats(filtered);
   if (currentView === 'gantt') renderGantt();
+  if (currentView === 'overdue') renderOverdue();
   document.getElementById('resultCount').innerHTML = `<strong>${filtered.length}</strong> of ${DATA.length} items`;
 }
 
@@ -826,10 +869,12 @@ let ganttStartMonth = null; // Date object, 1st of start month
 
 function switchView(v) {
   currentView = v;
-  document.getElementById('tableWrap').style.display  = v === 'list'  ? '' : 'none';
-  document.getElementById('ganttWrap').style.display  = v === 'gantt' ? '' : 'none';
-  document.getElementById('btnViewList').classList.toggle('active',  v === 'list');
-  document.getElementById('btnViewGantt').classList.toggle('active', v === 'gantt');
+  document.getElementById('tableWrap').style.display   = v === 'list'    ? '' : 'none';
+  document.getElementById('ganttWrap').style.display   = v === 'gantt'   ? '' : 'none';
+  document.getElementById('overdueWrap').style.display = v === 'overdue' ? '' : 'none';
+  document.getElementById('btnViewList').classList.toggle('active',    v === 'list');
+  document.getElementById('btnViewGantt').classList.toggle('active',   v === 'gantt');
+  document.getElementById('btnViewOverdue').classList.toggle('active', v === 'overdue');
   if (v === 'gantt') {
     if (!ganttStartMonth) {
       ganttStartMonth = new Date();
@@ -838,6 +883,7 @@ function switchView(v) {
     }
     renderGantt();
   }
+  if (v === 'overdue') renderOverdue();
 }
 
 // Parse a date value from the feature layer (ISO string or epoch ms)
@@ -980,9 +1026,11 @@ function renderGantt() {
   // ── Info bar ─────────────────────────────────────────────────────────────
   const totalWithDates = currentFiltered.filter(d => parseGanttDate(d.update_due)).length;
   const excluded = currentFiltered.length - totalWithDates;
+  const overdueNow = currentFiltered.filter(d => d.update_due && d.update_due.trim().toLowerCase() === 'due now').length;
   document.getElementById('ganttInfoBar').innerHTML =
     `<strong>${ganttItems.length}</strong> dataset${ganttItems.length!==1?'s':''} with updates due in this period &nbsp;·&nbsp; ` +
     `<strong>${excluded}</strong> item${excluded!==1?'s':''} excluded (static / no date set) &nbsp;·&nbsp; ` +
+    `<strong style="color:#f08080;">${overdueNow}</strong> <span style="color:#f08080;">overdue (Due Now)</span> &nbsp;·&nbsp; ` +
     `Hover a dot for name &nbsp;·&nbsp; Click for details`;
 
   // ── Today line pct ────────────────────────────────────────────────────────
@@ -1068,6 +1116,58 @@ function renderGantt() {
 
 function openGanttItem(idx) {
   if (idx >= 0 && idx < currentFiltered.length) openModal(idx);
+}
+
+function formatBrisbaneDate(val) {
+  if (!val || val === '' || val === '0') return '—';
+  const ts = Number(val);
+  if (!isNaN(ts) && ts > 0) {
+    // ArcGIS returns epoch ms; convert and display in Brisbane time (AEST UTC+10, no DST)
+    const d = new Date(ts);
+    return d.toLocaleDateString('en-AU', {
+      timeZone: 'Australia/Brisbane',
+      day: '2-digit', month: 'short', year: 'numeric'
+    });
+  }
+  // Already a string date — return as-is
+  return val;
+}
+
+function renderOverdue() {
+  const overdue = currentFiltered.filter(d => d.update_due && d.update_due.trim().toLowerCase() === 'due now');
+  const tbody = document.getElementById('overdueTableBody');
+  const empty = document.getElementById('overdueEmpty');
+  const countEl = document.getElementById('overdueCount');
+
+  countEl.textContent = `${overdue.length} dataset${overdue.length !== 1 ? 's' : ''} overdue`;
+
+  if (!overdue.length) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  // Find index in currentFiltered for modal
+  tbody.innerHTML = overdue.map((d, i) => {
+    const idx = currentFiltered.findIndex(r => r.item_name === d.item_name);
+    const st = catStyle(d.category);
+    const lastEdit = formatBrisbaneDate(d.last_edit_date);
+    const freq = d.update_frequency || '—';
+    return `<tr style="border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer;transition:background .15s;" 
+      onmouseover="this.style.background='rgba(215,40,47,.08)'" 
+      onmouseout="this.style.background=''"
+      onclick="openModal(${idx})">
+      <td style="padding:11px 16px;font-size:.86rem;font-weight:700;color:#fff;max-width:200px;">
+        ${h(d.item_name)}
+        ${d.category ? `<div style="margin-top:3px;display:inline-block;padding:1px 8px;border-radius:20px;font-size:.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:${st.bg};color:${st.color};border:1px solid ${st.color}44">${h(d.category)}</div>` : ''}
+      </td>
+      <td style="padding:11px 16px;font-size:.84rem;color:var(--silver);">${h(d.remit) || '<span style="color:var(--grey)">—</span>'}</td>
+      <td style="padding:11px 16px;font-size:.84rem;color:var(--silver);">${h(d.owner) || '<span style="color:var(--grey)">—</span>'}</td>
+      <td style="padding:11px 16px;font-size:.84rem;color:var(--silver);">${h(freq)}</td>
+      <td style="padding:11px 16px;font-size:.84rem;color:var(--silver);">${h(lastEdit)}</td>
+    </tr>`;
+  }).join('');
 }
 
 // ─── END GANTT ─────────────────────────────────────────────────────────────
