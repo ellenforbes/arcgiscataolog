@@ -605,7 +605,7 @@ function renderStats(subset) {
   const src = subset || DATA;
   const cats=new Set(src.map(d=>d.category).filter(Boolean));
   const owners=new Set(src.map(d=>d.owner).filter(Boolean));
-  const eligible=src.filter(d=>d.back_up!=='Skipped - Government Tag' && d.back_up!=='No Back Up Attempted');
+  const eligible=src.filter(d=>d.back_up!=='Skipped - Federal Government Tag' && d.back_up!=='No Back Up Attempted');
   const backedUp=eligible.filter(d=>d.back_up==='Backed Up to GDB').length;
   const backupPct=eligible.length?Math.round(backedUp/eligible.length*100):0;
   const flagged=src.filter(d=>d.flags).length;
