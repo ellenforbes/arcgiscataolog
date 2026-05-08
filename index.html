@@ -577,6 +577,7 @@ async function loadData() {
         update_frequency: sv(a.update_frequency),
         update_due:      sv(a.update_due),
         authoritative:    sv(a.authoritative),
+        editable:         sv(a.editable),
         dxf_path:         sv(a.dxf_path),
         shape_path:       sv(a.shape_path),
         flags:            sv(a.flags),
@@ -845,6 +846,8 @@ function openModal(i) {
       <div><div class="meta-label">Owner</div><div class="meta-value">${h(d.owner)||'—'}</div></div>
       <div><div class="meta-label">Back Up Status</div><div class="meta-value">${h(d.back_up)||'—'}</div></div>
       <div><div class="meta-label">Update Frequency</div><div class="meta-value">${formatUpdateFrequency(d.update_frequency, d.update_due)}</div></div>
+      <div><div class="meta-label">Last Edit Date</div><div class="meta-value">${formatBrisbaneDate(d.last_edit_date, true)}</div></div>
+      <div><div class="meta-label">Editable Layer</div><div class="meta-value">${d.editable?h(d.editable.charAt(0).toUpperCase()+d.editable.slice(1).toLowerCase()):'—'}</div></div>
       <div style="grid-column:1/-1"><div class="meta-label">Tags</div><div class="meta-value">${h(d.tags)||'—'}</div></div>
       <div style="grid-column:1/-1"><div class="meta-label">Flags</div><div class="meta-value">${flagHtml}</div></div>
     </div>
@@ -1138,18 +1141,22 @@ function openGanttItem(idx) {
   if (idx >= 0 && idx < currentFiltered.length) openModal(idx);
 }
 
-function formatBrisbaneDate(val) {
-  if (!val || val === '' || val === '0') return '—';
-  const ts = Number(val);
+function formatBrisbaneDate(val, includeTime) {
+  if (val === null || val === undefined || val === '' || val === '0') return '—';
+  let ts = Number(val);
   if (!isNaN(ts) && ts > 0) {
-    // ArcGIS returns epoch ms; convert and display in Brisbane time (AEST UTC+10, no DST)
+    // 10-digit = seconds, 13-digit = ms
+    if (ts < 1e12) ts *= 1000;
     const d = new Date(ts);
-    return d.toLocaleDateString('en-AU', {
-      timeZone: 'Australia/Brisbane',
-      day: '2-digit', month: 'short', year: 'numeric'
-    });
+    if (isNaN(d.getTime())) return '—';
+    const opts = { timeZone: 'Australia/Brisbane', day: '2-digit', month: 'short', year: 'numeric' };
+    if (includeTime) {
+      opts.hour = '2-digit'; opts.minute = '2-digit'; opts.hour12 = false;
+      return d.toLocaleString('en-AU', opts) + ' AEST';
+    }
+    return d.toLocaleDateString('en-AU', opts);
   }
-  // Already a string date — return as-is
+  // Already a formatted string — return as-is
   return val;
 }
 
