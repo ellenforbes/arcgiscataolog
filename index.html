@@ -166,8 +166,8 @@
   @media(max-width:700px)  { header{padding:20px} .main{padding:16px} .search-row{grid-template-columns:1fr} .header-title-block h1{font-size:1.8rem} }
   .auth-tick { display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; background:#2e7d52; border:1.5px solid #4caf77; border-radius:50%; color:#7dcca0; font-size:.6rem; font-weight:900; margin-left:6px; vertical-align:middle; flex-shrink:0; cursor:default; }
   .auth-tick-lg { width:22px; height:22px; font-size:.8rem; }
-  .dep-tag { display:inline-flex; align-items:center; justify-content:center; background:rgba(215,40,47,.15); border:1.5px solid #D7282F; border-radius:10px; color:#f08080; font-size:.62rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:1px 7px; margin-left:6px; vertical-align:middle; flex-shrink:0; cursor:default; line-height:1.4; }
-  .dep-tag-lg { font-size:.72rem; padding:2px 9px; }
+  .dep-tag { display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; background:rgba(215,40,47,.18); border:1.5px solid #D7282F; border-radius:50%; color:#f08080; font-size:.78rem; font-weight:900; margin-left:6px; vertical-align:middle; flex-shrink:0; cursor:default; line-height:1; }
+  .dep-tag-lg { width:22px; height:22px; font-size:1rem; }
 
   ::-webkit-scrollbar{width:6px;height:6px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:3px}
 
@@ -761,7 +761,7 @@ function renderTable(data) {
     if(d.shape_path)  links.push(`<a class="btn-link shape" href="${d.shape_path}" target="_blank"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1L1 6l7 9 7-9z"/></svg>Shape</a>`);
     const detailBtn=`<button class="btn-link desc-btn" onclick="openModal(${i})"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zM7 5h2v2H7zm0 3h2v5H7z"/></svg>Details</button>`;
     return `<tr style="animation-delay:${i*0.025}s">
-      <td class="name-cell"><a href="${d.url_to_data||'#'}" target="_blank">${h(d.item_name)}</a>${d.authoritative.toLowerCase()==='yes'?'<span class="auth-tick" title="Authoritative Dataset">✓</span>':''}${d.authoritative.toLowerCase()==='deprecated'?'<span class="dep-tag" title="Deprecated Dataset">⊘ Deprecated</span>':''}</td>
+      <td class="name-cell"><a href="${d.url_to_data||'#'}" target="_blank">${h(d.item_name)}</a>${d.authoritative.toLowerCase()==='yes'?'<span class="auth-tick" title="Authoritative Dataset">✓</span>':''}${d.authoritative.toLowerCase()==='deprecated'?'<span class="dep-tag" title="Deprecated Dataset">⊘</span>':''}</td>
       <td class="cat-cell">${catBadge}</td>
       <td class="summary-cell">${summaryCell}</td>
       <td class="remit-cell">${h(d.remit)||'<span style="color:var(--grey)">—</span>'}</td>
@@ -822,7 +822,7 @@ function openModal(i) {
 
   document.getElementById('modalContent').innerHTML=`
     ${d.category?`<div class="modal-cat" style="background:${st.bg};color:${st.color};border:1px solid ${st.color}44">${h(d.category)}</div>`:''}
-    <h2>${h(d.item_name)}${d.authoritative.toLowerCase()==='yes'?'<span class="auth-tick auth-tick-lg" title="Authoritative Dataset">✓</span>':''}${d.authoritative.toLowerCase()==='deprecated'?'<span class="dep-tag dep-tag-lg" title="Deprecated Dataset">⊘ Deprecated</span>':''}</h2>
+    <h2>${h(d.item_name)}${d.authoritative.toLowerCase()==='yes'?'<span class="auth-tick auth-tick-lg" title="Authoritative Dataset">✓</span>':''}${d.authoritative.toLowerCase()==='deprecated'?'<span class="dep-tag dep-tag-lg" title="Deprecated Dataset">⊘</span>':''}</h2>
     ${d.snippet?`<div class="modal-section"><div class="modal-section-label">Summary</div><p>${h(d.snippet)}</p></div>`:''}
     <div class="modal-section"><div class="modal-section-label">Description</div><p style="word-break:break-word;overflow-wrap:anywhere;" ${d.description?'':'class="empty"'}>${d.description?formatDescription(d.description):'No description provided.'}</p></div>
     <div class="modal-meta">
