@@ -504,7 +504,9 @@
 </div>
 
 <script>
-const FEATURE_LAYER_URL = 'https://services7.arcgis.com/GXOKTXcYr7P745Z7/arcgis/rest/services/agol_catalog/FeatureServer/0';
+const CATALOG_ITEM_ID = '6da64bb0d4074cac902f426cb0eedb4a';
+const PORTAL_URL = 'https://pembrokeod.maps.arcgis.com';
+let FEATURE_LAYER_URL = null; // resolved from the item at load time
 
 // Dynamic category colour palette — rich set that fits the dark navy theme
 const CAT_PALETTE = [
@@ -537,10 +539,23 @@ function buildCatColorMap() {
 
 let DATA = [], currentFiltered = [], sortField = null, sortAsc = true;
 
+async function resolveFeatureLayerUrl() {
+  if (FEATURE_LAYER_URL) return FEATURE_LAYER_URL;
+  const itemResp = await fetch(`${PORTAL_URL}/sharing/rest/content/items/${CATALOG_ITEM_ID}?f=json`);
+  if (!itemResp.ok) throw new Error(`Item lookup HTTP ${itemResp.status}`);
+  const item = await itemResp.json();
+  if (item.error) throw new Error(item.error.message);
+  if (!item.url) throw new Error('Catalog item has no service URL');
+  // Item URL points to the FeatureServer; we want layer 0
+  FEATURE_LAYER_URL = item.url.replace(/\/$/, '') + '/0';
+  return FEATURE_LAYER_URL;
+}
+
 async function loadData() {
   setLoading(true);
   setStatus('Loading…', '');
   try {
+    await resolveFeatureLayerUrl();
     const params = new URLSearchParams({ where:'1=1', outFields:'*', returnGeometry:'false', resultRecordCount:2000, f:'json' });
     const resp = await fetch(`${FEATURE_LAYER_URL}/query?${params}`);
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
