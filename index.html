@@ -168,8 +168,10 @@
   .auth-tick-lg { width:22px; height:22px; font-size:.8rem; }
   .dep-tag { display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; color:#D7282F; font-size:1.15rem; font-weight:400; margin-left:6px; vertical-align:middle; flex-shrink:0; cursor:default; line-height:1; }
   .dep-tag-lg { width:22px; height:22px; font-size:1.55rem; }
-  .edit-tick { display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; background:#8a6a1e; border:1.5px solid #d4a017; border-radius:50%; color:#f5d36a; font-size:.65rem; font-weight:900; margin-left:6px; vertical-align:middle; flex-shrink:0; cursor:default; line-height:1; }
-  .edit-tick-lg { width:22px; height:22px; font-size:.85rem; }
+  .edit-tick { display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; background:#8a6a1e; border:1.5px solid #d4a017; border-radius:50%; color:#f5d36a; margin-left:6px; vertical-align:middle; flex-shrink:0; cursor:default; line-height:1; }
+  .edit-tick svg { width:9px; height:9px; }
+  .edit-tick-lg { width:22px; height:22px; }
+  .edit-tick-lg svg { width:13px; height:13px; }
 
   ::-webkit-scrollbar{width:6px;height:6px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:3px}
 
@@ -441,7 +443,7 @@
       </div>
       <div class="info-item">
         <div class="info-item-icon" style="background:transparent;border-color:transparent;">
-          <span class="edit-tick edit-tick-lg" style="margin-left:0;">✎</span>
+          <span class="edit-tick edit-tick-lg" style="margin-left:0;"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></span>
         </div>
         <div>
           <div class="info-item-label">Field Maps Editable</div>
@@ -810,7 +812,7 @@ function renderTable(data) {
     if(d.shape_path)  links.push(`<a class="btn-link shape" href="${d.shape_path}" target="_blank"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1L1 6l7 9 7-9z"/></svg>Shape</a>`);
     const detailBtn=`<button class="btn-link desc-btn" onclick="openModal(${i})"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zM7 5h2v2H7zm0 3h2v5H7z"/></svg>Details</button>`;
     return `<tr style="animation-delay:${i*0.025}s">
-      <td class="name-cell"><a href="${d.url_to_data||'#'}" target="_blank">${h(d.item_name)}</a>${d.authoritative.toLowerCase()==='yes'?'<span class="auth-tick" title="Authoritative Dataset">✓</span>':''}${d.authoritative.toLowerCase()==='deprecated'?'<span class="dep-tag" title="Deprecated Dataset">⊘</span>':''}${(d.editable||'').toLowerCase()==='yes'?'<span class="edit-tick" title="Field Maps Editable">✎</span>':''}</td>
+      <td class="name-cell"><a href="${d.url_to_data||'#'}" target="_blank">${h(d.item_name)}</a>${d.authoritative.toLowerCase()==='yes'?'<span class="auth-tick" title="Authoritative Dataset">✓</span>':''}${d.authoritative.toLowerCase()==='deprecated'?'<span class="dep-tag" title="Deprecated Dataset">⊘</span>':''}${(d.editable||'').toLowerCase()==='yes'?'<span class="edit-tick" title="Field Maps Editable"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></span>':''}</td>
       <td class="cat-cell">${catBadge}</td>
       <td class="summary-cell">${summaryCell}</td>
       <td class="remit-cell">${h(d.remit)||'<span style="color:var(--grey)">—</span>'}</td>
@@ -871,7 +873,7 @@ function openModal(i) {
 
   document.getElementById('modalContent').innerHTML=`
     ${d.category?`<div class="modal-cat" style="background:${st.bg};color:${st.color};border:1px solid ${st.color}44">${h(d.category)}</div>`:''}
-    <h2>${h(d.item_name)}${d.authoritative.toLowerCase()==='yes'?'<span class="auth-tick auth-tick-lg" title="Authoritative Dataset">✓</span>':''}${d.authoritative.toLowerCase()==='deprecated'?'<span class="dep-tag dep-tag-lg" title="Deprecated Dataset">⊘</span>':''}${(d.editable||'').toLowerCase()==='yes'?'<span class="edit-tick edit-tick-lg" title="Field Maps Editable">✎</span>':''}</h2>
+    <h2>${h(d.item_name)}${d.authoritative.toLowerCase()==='yes'?'<span class="auth-tick auth-tick-lg" title="Authoritative Dataset">✓</span>':''}${d.authoritative.toLowerCase()==='deprecated'?'<span class="dep-tag dep-tag-lg" title="Deprecated Dataset">⊘</span>':''}${(d.editable||'').toLowerCase()==='yes'?'<span class="edit-tick edit-tick-lg" title="Field Maps Editable"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></span>':''}</h2>
     ${d.snippet?`<div class="modal-section"><div class="modal-section-label">Summary</div><p>${h(d.snippet)}</p></div>`:''}
     <div class="modal-section"><div class="modal-section-label">Description</div><p style="word-break:break-word;overflow-wrap:anywhere;" ${d.description?'':'class="empty"'}>${d.description?formatDescription(d.description):'No description provided.'}</p></div>
     <div class="modal-meta">
