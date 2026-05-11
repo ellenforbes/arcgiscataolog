@@ -168,6 +168,8 @@
   .auth-tick-lg { width:22px; height:22px; font-size:.8rem; }
   .dep-tag { display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; color:#D7282F; font-size:1.15rem; font-weight:400; margin-left:6px; vertical-align:middle; flex-shrink:0; cursor:default; line-height:1; }
   .dep-tag-lg { width:22px; height:22px; font-size:1.55rem; }
+  .edit-tick { display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; background:#8a6a1e; border:1.5px solid #d4a017; border-radius:50%; color:#f5d36a; font-size:.65rem; font-weight:900; margin-left:6px; vertical-align:middle; flex-shrink:0; cursor:default; line-height:1; }
+  .edit-tick-lg { width:22px; height:22px; font-size:.85rem; }
 
   ::-webkit-scrollbar{width:6px;height:6px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:3px}
 
@@ -415,8 +417,39 @@
     <button class="modal-close" onclick="closeInfoModal()">✕</button>
     <h2 style="font-family:'Oswald',sans-serif;font-size:1.3rem;color:#fff;margin-bottom:20px;display:flex;align-items:center;gap:10px;">
       <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" style="color:var(--slate);flex-shrink:0"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-      Download &amp; Format Information
+      Catalogue Information
     </h2>
+    <div style="font-family:'Oswald',sans-serif;font-size:.78rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--slate);margin-bottom:12px;">Dataset Status Icons</div>
+    <div class="info-items" style="margin-bottom:22px;">
+      <div class="info-item">
+        <div class="info-item-icon" style="background:transparent;border-color:transparent;">
+          <span class="auth-tick auth-tick-lg" style="margin-left:0;">✓</span>
+        </div>
+        <div>
+          <div class="info-item-label">Authoritative Dataset</div>
+          <div class="info-item-text">This dataset is the <strong>authoritative source</strong> for its subject — use it in preference to other copies.</div>
+        </div>
+      </div>
+      <div class="info-item">
+        <div class="info-item-icon" style="background:transparent;border-color:transparent;">
+          <span class="dep-tag dep-tag-lg" style="margin-left:0;">⊘</span>
+        </div>
+        <div>
+          <div class="info-item-label">Deprecated Dataset</div>
+          <div class="info-item-text">This dataset is <strong>deprecated</strong> and should no longer be used. Refer to a current alternative where available.</div>
+        </div>
+      </div>
+      <div class="info-item">
+        <div class="info-item-icon" style="background:transparent;border-color:transparent;">
+          <span class="edit-tick edit-tick-lg" style="margin-left:0;">✎</span>
+        </div>
+        <div>
+          <div class="info-item-label">Field Maps Editable</div>
+          <div class="info-item-text">This layer is <strong>editable in Field Maps</strong> — edits made in the field will sync back to the source dataset.</div>
+        </div>
+      </div>
+    </div>
+    <div style="font-family:'Oswald',sans-serif;font-size:.78rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--slate);margin-bottom:12px;">Download &amp; Format Information</div>
     <div class="info-items">
       <div class="info-item">
         <div class="info-item-icon" style="background:rgba(45,133,180,.2);border-color:rgba(45,133,180,.4);">
@@ -777,7 +810,7 @@ function renderTable(data) {
     if(d.shape_path)  links.push(`<a class="btn-link shape" href="${d.shape_path}" target="_blank"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1L1 6l7 9 7-9z"/></svg>Shape</a>`);
     const detailBtn=`<button class="btn-link desc-btn" onclick="openModal(${i})"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zM7 5h2v2H7zm0 3h2v5H7z"/></svg>Details</button>`;
     return `<tr style="animation-delay:${i*0.025}s">
-      <td class="name-cell"><a href="${d.url_to_data||'#'}" target="_blank">${h(d.item_name)}</a>${d.authoritative.toLowerCase()==='yes'?'<span class="auth-tick" title="Authoritative Dataset">✓</span>':''}${d.authoritative.toLowerCase()==='deprecated'?'<span class="dep-tag" title="Deprecated Dataset">⊘</span>':''}</td>
+      <td class="name-cell"><a href="${d.url_to_data||'#'}" target="_blank">${h(d.item_name)}</a>${d.authoritative.toLowerCase()==='yes'?'<span class="auth-tick" title="Authoritative Dataset">✓</span>':''}${d.authoritative.toLowerCase()==='deprecated'?'<span class="dep-tag" title="Deprecated Dataset">⊘</span>':''}${(d.editable||'').toLowerCase()==='yes'?'<span class="edit-tick" title="Field Maps Editable">✎</span>':''}</td>
       <td class="cat-cell">${catBadge}</td>
       <td class="summary-cell">${summaryCell}</td>
       <td class="remit-cell">${h(d.remit)||'<span style="color:var(--grey)">—</span>'}</td>
@@ -838,7 +871,7 @@ function openModal(i) {
 
   document.getElementById('modalContent').innerHTML=`
     ${d.category?`<div class="modal-cat" style="background:${st.bg};color:${st.color};border:1px solid ${st.color}44">${h(d.category)}</div>`:''}
-    <h2>${h(d.item_name)}${d.authoritative.toLowerCase()==='yes'?'<span class="auth-tick auth-tick-lg" title="Authoritative Dataset">✓</span>':''}${d.authoritative.toLowerCase()==='deprecated'?'<span class="dep-tag dep-tag-lg" title="Deprecated Dataset">⊘</span>':''}</h2>
+    <h2>${h(d.item_name)}${d.authoritative.toLowerCase()==='yes'?'<span class="auth-tick auth-tick-lg" title="Authoritative Dataset">✓</span>':''}${d.authoritative.toLowerCase()==='deprecated'?'<span class="dep-tag dep-tag-lg" title="Deprecated Dataset">⊘</span>':''}${(d.editable||'').toLowerCase()==='yes'?'<span class="edit-tick edit-tick-lg" title="Field Maps Editable">✎</span>':''}</h2>
     ${d.snippet?`<div class="modal-section"><div class="modal-section-label">Summary</div><p>${h(d.snippet)}</p></div>`:''}
     <div class="modal-section"><div class="modal-section-label">Description</div><p style="word-break:break-word;overflow-wrap:anywhere;" ${d.description?'':'class="empty"'}>${d.description?formatDescription(d.description):'No description provided.'}</p></div>
     <div class="modal-meta">
