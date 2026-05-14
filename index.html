@@ -689,7 +689,7 @@ function renderChart(filtered) {
     const key = byRemit ? (d.remit || '(No Remit)') : d.category;
     if (key) counts[key] = (counts[key] || 0) + 1;
   });
-  const sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]), max = sorted[0]?.[1] || 1;
+  const sorted = Object.entries(counts).sort((a,b) => a[0].localeCompare(b[0])), max = Math.max(1, ...sorted.map(([,n])=>n));
 
   document.getElementById('chartBars').innerHTML = sorted.map(([label, n]) => {
     const st = byRemit
